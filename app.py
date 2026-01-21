@@ -18,20 +18,57 @@ secondary = st.sidebar.selectbox('Select Secondary Parameter',sorted(df.columns[
 
 plot = st.sidebar.button('Plot Graph')
 
+st.title("📊 Indian Data Visualization Dashboard")
+
+st.markdown("---")
+
+map_section = st.container()
+
+st.markdown("""
+This interactive dashboard helps visualize **district-wise Indian data**
+using maps and dynamic parameters like population, literacy rate, sex ratio etc.
+""")
+
+
 if plot:
 
-    st.text('Size represents primary parameter')
-    st.text('color represents secondary parameter')
-    
-    if selected_state == 'Overall India':
-        fig = px.scatter_mapbox(df, lat="Latitude", lon="Longitude",size=primary,color=secondary, zoom=4, mapbox_style="carto-positron",size_max=35,width=1200,height=700,hover_name='District')
+    with map_section:
 
-        st.plotly_chart(fig,use_container_width=True)
+        st.subheader("🗺️ Geographical Visualization")
 
-    else:
-        state_df = df[df['State'] == selected_state]
+        st.caption("🔵 Size represents primary parameter | 🎨 Color represents secondary parameter")
 
-        fig = px.scatter_mapbox(state_df, lat="Latitude", lon="Longitude", size=primary, color=secondary, zoom=6,
-                                mapbox_style="carto-positron", size_max=35, width=1200, height=700,hover_name='District')
+        if selected_state == 'Overall India':
 
-        st.plotly_chart(fig, use_container_width=True)
+            fig = px.scatter_mapbox(
+                df,
+                lat="Latitude",
+                lon="Longitude",
+                size=primary,
+                color=secondary,
+                zoom=4,
+                mapbox_style="carto-positron",
+                size_max=35,
+                height=650,
+                hover_name='District'
+            )
+
+            st.plotly_chart(fig, use_container_width=True)
+
+        else:
+            state_df = df[df['State'] == selected_state]
+
+            fig = px.scatter_mapbox(
+                state_df,
+                lat="Latitude",
+                lon="Longitude",
+                size=primary,
+                color=secondary,
+                zoom=6,
+                mapbox_style="carto-positron",
+                size_max=35,
+                height=650,
+                hover_name='District'
+            )
+
+            st.plotly_chart(fig, use_container_width=True)
