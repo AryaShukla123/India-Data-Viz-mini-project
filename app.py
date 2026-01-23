@@ -28,11 +28,11 @@ secondary = st.sidebar.selectbox(
 )
 
 if primary == secondary:
-    st.sidebar.warning("Primary and Secondary parameters should be different")
+    st.warning("Primary and Secondary parameters should be different")
 
 plot = st.sidebar.button('Plot Graph')
 
-st.title("📊 Indian Data Visualization Dashboard")
+st.title("Indian Data Visualization Dashboard")
 
 st.markdown("---")
 
@@ -47,16 +47,54 @@ kpi_section = st.container()
 
 if plot:
 
+    if selected_state == 'Overall India':
+        kpi_df = df.copy()
+    else:
+        kpi_df = df[df['State'] == selected_state]
 
-    with map_section:
+    tab1, tab2, tab3 = st.tabs(["Overview", "Analysis", "Map View"])
 
-        st.subheader("🗺️ Geographical Visualization")
+    with tab1:
 
-        st.caption("🔵 Size represents primary parameter | 🎨 Color represents secondary parameter")
+        st.subheader("Key Performance Indicators")
+
+        total_population = int(kpi_df['Population'].sum())
+        avg_literacy = round(kpi_df['literacy_rate'].mean(), 2)
+        avg_sex_ratio = round(kpi_df['sex_ratio'].mean(), 2)
+        total_districts = kpi_df['District'].nunique()
+
+        col1, col2, col3, col4 = st.columns(4)
+
+        col1.metric("👥 Total Population", f"{total_population:,}")
+        col2.metric("📚 Avg Literacy Rate (%)", avg_literacy)
+        col3.metric("⚖️ Avg Sex Ratio", avg_sex_ratio)
+        col4.metric("🏘️ Total Districts", total_districts)
+
+        st.markdown("---")
+
+    with tab2:
+
+        st.subheader(f"Analysis for: {primary}")
+
+        primary_total = int(kpi_df[primary].sum())
+        primary_avg = round(kpi_df[primary].mean(), 2)
+        primary_max = kpi_df[primary].max()
+        primary_min = kpi_df[primary].min()
+
+        col1, col2, col3, col4 = st.columns(4)
+
+        col1.metric(f"🔢 Total {primary}", f"{primary_total:,}")
+        col2.metric(f"📊 Avg {primary}", primary_avg)
+        col3.metric(f"⬆️ Max {primary}", primary_max)
+        col4.metric(f"⬇️ Min {primary}", primary_min)
+
+        st.markdown("---")
+
+    with tab3:
+        st.subheader("Geographical Visualization")
+        st.caption("🔵 Size = Primary | 🎨 Color = Secondary")
 
         if selected_state == 'Overall India':
-            kpi_df = df.copy()
-
             fig = px.scatter_mapbox(
                 df,
                 lat="Latitude",
@@ -69,12 +107,7 @@ if plot:
                 height=650,
                 hover_name='District'
             )
-
-            st.plotly_chart(fig, use_container_width=True)
-
         else:
-            kpi_df = df[df['State'] == selected_state]
-
             fig = px.scatter_mapbox(
                 kpi_df,
                 lat="Latitude",
@@ -88,22 +121,8 @@ if plot:
                 hover_name='District'
             )
 
-            st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, use_container_width=True)
 
-            total_population = int(kpi_df['Population'].sum())
-            avg_literacy = round(kpi_df['literacy_rate'].mean(), 2)
-            avg_sex_ratio = round(kpi_df['sex_ratio'].mean(), 2)
-            total_districts = kpi_df['District'].nunique()
-
-            with kpi_section:
-                col1, col2, col3, col4 = st.columns(4)
-
-                col1.metric("👥 Total Population", f"{total_population:,}")
-                col2.metric("📚 Avg Literacy Rate (%)", avg_literacy)
-                col3.metric("⚖️ Avg Sex Ratio", avg_sex_ratio)
-                col4.metric("🏘️ Total Districts", total_districts)
-
-            st.markdown("---")
 
 
 
