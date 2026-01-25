@@ -70,6 +70,37 @@ if plot:
         col3.metric("⚖️ Avg Sex Ratio", avg_sex_ratio)
         col4.metric("🏘️ Total Districts", total_districts)
 
+        st.subheader("Top 5 States by Population")
+
+        state_pop = (
+            kpi_df
+            .groupby('State')['Population']
+            .sum()
+            .sort_values(ascending=False)
+            .head(5)
+            .reset_index()
+        )
+
+        fig_state = px.bar(
+            state_pop,
+            x='State',
+            y='Population',
+            color='Population',
+            color_continuous_scale='Viridis',
+            text_auto='.2s',
+            title="Top 5 States by Population"
+        )
+
+        fig_state.update_layout(
+            template='plotly_dark',
+            title_font_size=22,
+            xaxis_title="State",
+            yaxis_title="Population",
+            height=450
+        )
+
+        st.plotly_chart(fig_state, use_container_width=True)
+
         st.markdown("---")
 
     with tab2:
@@ -87,6 +118,61 @@ if plot:
         col2.metric(f"📊 Avg {primary}", primary_avg)
         col3.metric(f"⬆️ Max {primary}", primary_max)
         col4.metric(f"⬇️ Min {primary}", primary_min)
+
+        st.subheader(f"Top 10 Districts by {primary}")
+
+        top_districts = (
+            kpi_df
+            .sort_values(by=primary, ascending=False)
+            .head(10)
+        )
+
+        fig_top = px.bar(
+            top_districts,
+            x=primary,
+            y='District',
+            orientation='h',
+            color=primary,
+            color_continuous_scale='Blues',
+            text_auto='.2s',
+            title=f"Top 10 Districts by {primary}"
+        )
+
+        fig_top.update_layout(
+            title_font_size=22,
+            xaxis_title=primary,
+            yaxis_title="District",
+            template='plotly_dark',
+            height=500
+        )
+
+        st.plotly_chart(fig_top, use_container_width=True)
+
+        st.subheader(f"Relationship between {primary} & {secondary}")
+
+        fig_scatter = px.scatter(
+            kpi_df,
+            x=primary,
+            y=secondary,
+            color='State',
+            hover_name='District',
+            size=primary,
+            size_max=18,
+            opacity=0.75,
+            trendline='ols',
+            title=f"{primary} vs {secondary} (District-wise)"
+        )
+
+        fig_scatter.update_layout(
+            template='plotly_dark',
+            title_font_size=22,
+            xaxis_title=primary,
+            yaxis_title=secondary,
+            legend_title="State",
+            height=600
+        )
+
+        st.plotly_chart(fig_scatter, use_container_width=True)
 
         st.markdown("---")
 
@@ -122,6 +208,19 @@ if plot:
             )
 
         st.plotly_chart(fig, use_container_width=True)
+
+    st.subheader("Download Report")
+
+    csv = kpi_df.to_csv(index=False).encode('utf-8')
+
+    st.download_button(
+        label="⬇️ Download District-wise Data (CSV)",
+        data=csv,
+        file_name=f"{selected_state}_india_report.csv",
+        mime='text/csv'
+    )
+
+
 
 
 
