@@ -17,15 +17,12 @@ selected_state = st.sidebar.selectbox('Select a state',list_of_states)
 # select only numeric columns for parameters
 numeric_cols = df.select_dtypes(include=np.number).columns.tolist()
 
-primary = st.sidebar.selectbox(
-    'Select Primary Parameter',
-    sorted(numeric_cols)
-)
+primary = st.sidebar.selectbox('Select Primary Parameter',sorted(numeric_cols))
 
-secondary = st.sidebar.selectbox(
-    'Select Secondary Parameter',
-    sorted(numeric_cols)
-)
+secondary = st.sidebar.selectbox('Select Secondary Parameter',sorted(numeric_cols))
+
+normalize = st.sidebar.checkbox("Normalize values")
+
 
 if primary == secondary:
     st.warning("Primary and Secondary parameters should be different")
@@ -51,6 +48,12 @@ if plot:
         kpi_df = df.copy()
     else:
         kpi_df = df[df['State'] == selected_state]
+
+    if normalize:
+        kpi_df = kpi_df.copy()
+        kpi_df[primary] = (kpi_df[primary] - kpi_df[primary].min()) / (kpi_df[primary].max() - kpi_df[primary].min())
+        kpi_df[secondary] = (kpi_df[secondary] - kpi_df[secondary].min()) / (
+                    kpi_df[secondary].max() - kpi_df[secondary].min())
 
     tab1, tab2, tab3 = st.tabs(["Overview", "Analysis", "Map View"])
 
@@ -105,6 +108,11 @@ if plot:
 
     with tab2:
 
+        if normalize:
+            st.info("Values are normalized (0–1 scale) for fair comparison")
+        else:
+            st.info("Showing raw values")
+
         st.subheader(f"Analysis for: {primary}")
 
         primary_total = int(kpi_df[primary].sum())
@@ -133,7 +141,7 @@ if plot:
             y='District',
             orientation='h',
             color=primary,
-            color_continuous_scale='Blues',
+            color_continuous_scale='Turbo' if normalize else 'Blues',
             text_auto='.2s',
             title=f"Top 10 Districts by {primary}"
         )
@@ -157,7 +165,7 @@ if plot:
             color='State',
             hover_name='District',
             size=primary,
-            size_max=18,
+            size_max = 35 if normalize else 18,
             opacity=0.75,
             trendline='ols',
             title=f"{primary} vs {secondary} (District-wise)"
@@ -166,8 +174,8 @@ if plot:
         fig_scatter.update_layout(
             template='plotly_dark',
             title_font_size=22,
-            xaxis_title=primary,
-            yaxis_title=secondary,
+            xaxis_title=f"{primary} (Normalized)" if normalize else primary,
+            yaxis_title=f"{secondary} (Normalized)" if normalize else secondary,
             legend_title="State",
             height=600
         )
@@ -177,19 +185,26 @@ if plot:
         st.markdown("---")
 
     with tab3:
+
+        if normalize:
+            st.caption("Map values are normalized (0–1 scale)")
+        else:
+            st.caption("Map shows raw values")
+
         st.subheader("Geographical Visualization")
         st.caption("🔵 Size = Primary | 🎨 Color = Secondary")
 
         if selected_state == 'Overall India':
             fig = px.scatter_mapbox(
-                df,
+                kpi_df,
                 lat="Latitude",
                 lon="Longitude",
                 size=primary,
                 color=secondary,
+                color_continuous_scale='Turbo' if normalize else 'Viridis',
                 zoom=4,
                 mapbox_style="carto-positron",
-                size_max=35,
+                size_max = 60 if normalize else 35,
                 height=650,
                 hover_name='District'
             )
@@ -200,14 +215,17 @@ if plot:
                 lon="Longitude",
                 size=primary,
                 color=secondary,
+                color_continuous_scale='Turbo' if normalize else 'Viridis',
                 zoom=6,
                 mapbox_style="carto-positron",
-                size_max=35,
+                size_max = 60 if normalize else 35,
                 height=650,
                 hover_name='District'
             )
 
         st.plotly_chart(fig, use_container_width=True)
+
+        st.markdown("---")
 
     st.subheader("Download Report")
 
