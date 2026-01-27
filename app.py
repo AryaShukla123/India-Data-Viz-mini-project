@@ -29,20 +29,20 @@ if primary == secondary:
 
 plot = st.sidebar.button("Build Dashboard",type="primary",use_container_width=True)
 
-st.title("Indian Data Visualization Dashboard")
-
-st.markdown("---")
-
-map_section = st.container()
-
-st.markdown("""
-This interactive dashboard helps visualize **district-wise Indian data**
-using maps and dynamic parameters like population, literacy rate, sex ratio etc.
-""")
-kpi_section = st.container()
-
 
 if plot:
+
+    st.title("Indian Data Visualization Dashboard")
+
+    st.markdown("---")
+
+    map_section = st.container()
+
+    st.markdown("""
+    This interactive dashboard helps visualize **district-wise Indian data**
+    using maps and dynamic parameters like population, literacy rate, sex ratio etc.
+    """)
+    kpi_section = st.container()
 
     if selected_state == 'Overall India':
         kpi_df = df.copy()
@@ -259,6 +259,67 @@ if plot:
         file_name=f"{selected_state}_india_report.csv",
         mime='text/csv'
     )
+
+else:
+
+    welcome_html = """
+    <style>
+        .welcome-card {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+        .step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .step-number {
+            background: #FF4B4B;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+    </style>
+
+    <div class="welcome-card">
+        <h1 style="text-align:center;">🇮🇳 Indian Data Visualization Dashboard</h1>
+        <p style="text-align:center; color: #FAFAFA;">
+            Explore district-wise Indian data using interactive charts, maps, and analytical insights.
+        </p>
+        <hr style="border: 0.5px solid #333; margin: 30px 0;">
+        <div style="margin-left: 20px;">
+            <h3 style="margin-bottom: 20px;">Get Started:</h3>
+            <div class="step">
+                <div class="step-number">1</div>
+                <div>Select a <b>State</b> from the sidebar.</div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div>Choose <b>Primary & Secondary</b> parameters.</div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div>Click the <b>Build Dashboard</b> button.</div>
+            </div>
+        </div>
+    </div>
+    """
+    st.markdown(welcome_html, unsafe_allow_html=True)
+
+
+
+
 
 
 
