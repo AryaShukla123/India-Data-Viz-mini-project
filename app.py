@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 import plotly.express as px
+import scipy.stats as stats
 
 st.set_page_config(layout='wide')
 
@@ -203,6 +204,39 @@ if plot:
         )
 
         st.plotly_chart(fig_scatter, use_container_width=True)
+
+        st.markdown("---")
+        st.subheader(f"Statistical Insight: {primary} vs {secondary}")
+
+        corr_df = kpi_df[[primary, secondary]].dropna()
+        if len(corr_df) > 1:
+            correlation, p_value = stats.pearsonr(corr_df[primary], corr_df[secondary])
+
+
+            col_corr, col_text = st.columns([1, 2])
+
+            with col_corr:
+                st.metric("Correlation (r)", round(correlation, 3))
+
+            with col_text:
+
+                if correlation > 0.7:
+                    st.success(
+                        f"**Strong Positive Correlation:** As {primary} increases, {secondary} tends to increase significantly.")
+                elif correlation > 0.3:
+                    st.info(
+                        f"**Moderate Positive Correlation:** There is a general upward trend between these parameters.")
+                elif correlation < -0.7:
+                    st.warning(
+                        f"**Strong Negative Correlation:** As {primary} increases, {secondary} tends to decrease significantly.")
+                elif correlation < -0.3:
+                    st.info(
+                        f"**Moderate Negative Correlation:** There is a general downward trend between these parameters.")
+                else:
+                    st.secondary(
+                        "**Weak/No Linear Correlation:** These two parameters don't seem to have a strong linear relationship.")
+        else:
+            st.error("Not enough data to calculate correlation.")
 
         st.markdown("---")
 
