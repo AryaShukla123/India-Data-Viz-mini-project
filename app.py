@@ -27,7 +27,7 @@ normalize = st.sidebar.checkbox("Normalize values")
 if primary == secondary:
     st.warning("Primary and Secondary parameters should be different")
 
-plot = st.sidebar.button('Plot Graph')
+plot = st.sidebar.button("Build Dashboard",type="primary",use_container_width=True)
 
 st.title("Indian Data Visualization Dashboard")
 
@@ -155,6 +155,28 @@ if plot:
         )
 
         st.plotly_chart(fig_top, use_container_width=True)
+
+        st.subheader(f"Top 10 Districts (Table) – {primary}")
+
+        top10_table = (
+            kpi_df
+            .sort_values(by=primary, ascending=False)
+            .head(10)[['District', 'State', primary]]
+        )
+
+        st.dataframe(top10_table, use_container_width=True)
+
+        st.subheader(f"Bottom 10 Districts (Table) – {primary}")
+
+        bottom10_table = (
+            kpi_df
+            .sort_values(by=primary, ascending=True)
+            .head(10)[['District', 'State', primary]]
+        )
+
+        st.dataframe(bottom10_table, use_container_width=True)
+
+        st.markdown("---")
 
         st.subheader(f"Relationship between {primary} & {secondary}")
 
