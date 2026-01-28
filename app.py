@@ -409,7 +409,7 @@ else:
     </style>
 
     <div class="welcome-card">
-        <h1 style="text-align:center;">🇮🇳 Indian Data Visualization Dashboard</h1>
+        <h1 style="text-align:center;">Indian Data Visualization Dashboard</h1>
         <p style="text-align:center; color: #FAFAFA;">
             Explore district-wise Indian data using interactive charts, maps, and analytical insights.
         </p>
