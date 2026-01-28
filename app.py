@@ -6,6 +6,56 @@ import scipy.stats as stats
 
 st.set_page_config(layout='wide')
 
+st.markdown("""
+    <style>
+        /* Keep your professional font */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+
+        html, body, [class*="css"], .stMarkdown {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* 1. NEW SIDEBAR UI: High contrast background and border */
+        [data-testid="stSidebar"] {
+            min-width: 320px;
+            max-width: 320px;
+            background-color: #11141c !important; /* Distinct dark shade */
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* 2. HIGHLIGHTED DROPDOWNS: Making them visible against the sidebar */
+        div[data-baseweb="select"] > div {
+            background-color: #1e222d !important;
+            border-radius: 8px !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        }
+
+        /* Highlighting widget labels for better readability */
+        [data-testid="stWidgetLabel"] p {
+            color: #ffffff !important;
+            font-weight: 600 !important;
+        }
+
+        /* 3. ORIGINAL KPI STYLING: Preserved exactly as you had it */
+        [data-testid="stMetricValue"] {
+            font-size: 28px;
+            color: #1f77b4;
+            font-weight: 800;
+        }
+
+        div[data-testid="stMetric"] {
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar .sidebar-content {
+            padding-top: 2rem;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
 df = pd.read_csv('india (1).csv')
 
 list_of_states = list(df['State'].unique())
@@ -221,20 +271,15 @@ if plot:
             with col_text:
 
                 if correlation > 0.7:
-                    st.success(
-                        f"**Strong Positive Correlation:** As {primary} increases, {secondary} tends to increase significantly.")
+                    st.success(f"**Strong Positive Correlation:** As {primary} increases, {secondary} tends to increase significantly.")
                 elif correlation > 0.3:
-                    st.info(
-                        f"**Moderate Positive Correlation:** There is a general upward trend between these parameters.")
+                    st.info(f"**Moderate Positive Correlation:** There is a general upward trend between these parameters.")
                 elif correlation < -0.7:
-                    st.warning(
-                        f"**Strong Negative Correlation:** As {primary} increases, {secondary} tends to decrease significantly.")
+                    st.warning(f"**Strong Negative Correlation:** As {primary} increases, {secondary} tends to decrease significantly.")
                 elif correlation < -0.3:
-                    st.info(
-                        f"**Moderate Negative Correlation:** There is a general downward trend between these parameters.")
+                    st.info(f"**Moderate Negative Correlation:** There is a general downward trend between these parameters.")
                 else:
-                    st.secondary(
-                        "**Weak/No Linear Correlation:** These two parameters don't seem to have a strong linear relationship.")
+                    st.secondary("**Weak/No Linear Correlation:** These two parameters don't seem to have a strong linear relationship.")
         else:
             st.error("Not enough data to calculate correlation.")
 
