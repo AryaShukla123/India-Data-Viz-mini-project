@@ -58,6 +58,11 @@ st.markdown("""
 
 df = pd.read_csv('india (1).csv')
 
+if 'female_literate' in df.columns and 'male_literate' in df.columns:
+    # Adding 1 to denominator to prevent division by zero errors
+    df['Literacy_Gender_Ratio'] = (df['Female_Literate'] / (df['Male_Literate'] + 1)) * 100
+
+
 list_of_states = list(df['State'].unique())
 list_of_states.insert(0,'Overall India')
 
@@ -65,7 +70,6 @@ st.sidebar.title('Indian Data Visualization')
 
 selected_state = st.sidebar.selectbox('Select a state',list_of_states)
 
-# select only numeric columns for parameters
 numeric_cols = df.select_dtypes(include=np.number).columns.tolist()
 
 primary = st.sidebar.selectbox('Select Primary Parameter',sorted(numeric_cols))
@@ -229,19 +233,52 @@ if plot:
 
         st.markdown("---")
 
-        st.subheader(f"Relationship between {primary} & {secondary}")
+        st.subheader(f"Outlier Detection: {primary}")
+
+
+        z_scores = stats.zscore(kpi_df[primary].dropna())
+        kpi_df_outliers = kpi_df.dropna(subset=[primary]).copy()
+        kpi_df_outliers['z_score'] = z_scores
+
+        # Define threshold (2 is standard, 3 is for extreme outliers)
+        threshold = 2
+        outliers = kpi_df_outliers[abs(kpi_df_outliers['z_score']) > threshold]
+
+        if not outliers.empty:
+            st.warning(f"Found {len(outliers)} districts with unusual {primary} levels (Z-Score > {threshold})")
+
+            # Split into High and Low outliers
+            high_outliers = outliers[outliers['z_score'] > 0].sort_values('z_score', ascending=False)
+            low_outliers = outliers[outliers['z_score'] < 0].sort_values('z_score', ascending=True)
+
+            col_h, col_l = st.columns(2)
+
+            with col_h:
+                st.write("**Significantly Higher than Avg:**")
+                st.dataframe(high_outliers[['District', primary, 'z_score']].head(5))
+
+            with col_l:
+                st.write("**Significantly Lower than Avg:**")
+                st.dataframe(low_outliers[['District', primary, 'z_score']].head(5))
+        else:
+            st.success(f"No extreme outliers detected for {primary} in this selection.")
+
+        st.subheader("Outliers By Scatter Plot")
+
+        kpi_df['Is_Outlier'] = abs(stats.zscore(kpi_df[primary])) > 2
 
         fig_scatter = px.scatter(
             kpi_df,
             x=primary,
             y=secondary,
-            color='State',
+            color='Is_Outlier',
+            color_discrete_map={True: 'red', False: 'blue'},
             hover_name='District',
             size=primary,
             size_max = 35 if normalize else 18,
             opacity=0.75,
             trendline='ols',
-            title=f"{primary} vs {secondary} (District-wise)"
+            title=f"Highlighting Outliers in {primary} vs {secondary}"
         )
 
         fig_scatter.update_layout(
@@ -279,7 +316,7 @@ if plot:
                 elif correlation < -0.3:
                     st.info(f"**Moderate Negative Correlation:** There is a general downward trend between these parameters.")
                 else:
-                    st.secondary("**Weak/No Linear Correlation:** These two parameters don't seem to have a strong linear relationship.")
+                    st.info("**Weak/No Linear Correlation:** These two parameters don't seem to have a strong linear relationship.")
         else:
             st.error("Not enough data to calculate correlation.")
 
