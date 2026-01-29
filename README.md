@@ -8,7 +8,7 @@
 A high-performance, interactive analytical dashboard built with **Streamlit** to visualize and interpret district-level 2011 Indian Census data. This tool transforms raw geospatial and demographic data into actionable insights through statistical modeling and modern UI components.
 
 ## 🚀 Live Demo
-
+[🔗 View the Live Dashboard](https://india-data-viz-mini-project-b8376m5bjxap3stcqirbqv.streamlit.app/)
 
 ## Key Features
 
