@@ -241,7 +241,7 @@ if plot:
         kpi_df_outliers['z_score'] = z_scores
 
         # Define threshold (2 is standard, 3 is for extreme outliers)
-        threshold = 2
+        threshold = 1
         outliers = kpi_df_outliers[abs(kpi_df_outliers['z_score']) > threshold]
 
         if not outliers.empty:
